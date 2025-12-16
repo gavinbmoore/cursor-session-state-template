@@ -1,0 +1,75 @@
+# Dependencies
+node_modules/
+vendor/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+.nuxt/
+.output/
+.svelte-kit/
+
+# Cache
+.cache/
+.parcel-cache/
+.turbo/
+.vercel/
+.netlify/
+
+# Testing
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# IDE & OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Generated files
+*.generated.*
+*.min.js
+*.min.css
+*.map
+
+# Database
+*.sqlite
+*.db
+prisma/migrations/
+
+# Package locks (optional - uncomment if you don't want these indexed)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Large files
+*.mp4
+*.mov
+*.zip
+*.tar.gz
+*.rar
+
+# Documentation build output
+docs/_build/
+site/

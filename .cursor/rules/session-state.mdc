@@ -1,0 +1,148 @@
+# Session State Management Rules
+
+You are an AI assistant with persistent context across sessions via PROJECT_STATE.md.
+
+## Context Loading Protocol
+
+**At the START of every conversation:**
+
+1. Read `PROJECT_STATE.md` FIRST before doing anything else
+2. Understand: current phase, active task, recent changes, and next steps
+3. If state file is current (updated within last session), DO NOT scan the full codebase
+4. Briefly acknowledge where we are: "Continuing with [current task]..." (one line, not verbose)
+
+**If PROJECT_STATE.md is missing or empty:**
+- Ask user for current project context
+- Create/populate the state file based on their response
+- Then proceed with the task
+
+## State Update Protocol
+
+**At the END of every completed task, you MUST update PROJECT_STATE.md:**
+
+1. Update `## Meta` with current timestamp and task description
+2. Move completed items from `## Current Task Breakdown` (mark with [x])
+3. Add entry to `## Recent Changes` (prepend, keep last 10 max)
+4. Update `## Next Steps` based on what you learned
+5. Add any discoveries to `## Lessons Learned`
+6. Log significant decisions in `## Decisions Log`
+
+**Update BEFORE telling the user you're done.** This is mandatory, not optional.
+
+## What to Track
+
+### Always Update
+- Current task progress and completion
+- New files created or significantly modified
+- Blockers encountered and resolved
+- Decisions made during implementation
+
+### Update When Relevant
+- Gotchas and workarounds discovered
+- File relationships identified
+- External API quirks or constraints
+- Commands that were useful
+
+### Never Track
+- Routine file reads
+- Minor formatting changes
+- Conversation details (just outcomes)
+
+## Token Efficiency Rules
+
+1. **State file is your shortcut** - If PROJECT_STATE.md describes the current context, use it instead of scanning files
+2. **Reference, don't duplicate** - Point to files/functions, don't copy their contents into state
+3. **Concise entries** - Each log entry should be one line when possible
+4. **Prune aggressively** - Keep Recent Changes to last 10 items, archive older entries if needed
+
+## Task Breakdown Management
+
+For complex features (more than ~30 mins of work):
+
+1. Create a checkbox breakdown in `## Current Task Breakdown`
+2. Update checkboxes as you complete subtasks
+3. Add sub-items for discovered complexity
+4. When feature complete, move summary to `## Recent Changes` and clear breakdown
+
+Example:
+```markdown
+## Current Task Breakdown
+Feature: User Authentication
+- [x] Set up auth client
+- [x] Create login form
+- [ ] Password reset flow
+  - [x] Request UI
+  - [ ] Email template ← CURRENT
+  - [ ] Confirmation page
+```
+
+## Lessons Learned Protocol
+
+When you discover something non-obvious:
+
+1. **Immediately** add to `## Lessons Learned`
+2. Format: `- [DATE] Brief description of gotcha/solution`
+3. Before troubleshooting any issue, CHECK this section first—solution may exist
+
+Examples of what to log:
+- API quirks: "Supabase RLS must be configured before seeding data"
+- Framework gotchas: "Next.js 14 server actions can't be called from client directly"
+- Tooling issues: "Prisma requires regeneration after schema changes"
+
+## Decision Logging
+
+For significant decisions (architecture, library choices, patterns):
+
+1. Log in `## Decisions Log` with date
+2. Include brief rationale (WHY, not just WHAT)
+3. Note alternatives considered if relevant
+
+This prevents re-debating settled decisions in future sessions.
+
+## State Validation
+
+**Every 3-5 tasks, or when session feels "off":**
+
+1. Scan `## Current Task Breakdown` - does it match actual implementation?
+2. Check `## Next Steps` - still accurate priorities?
+3. Review `## Lessons Learned` - anything to add from recent work?
+4. Verify `## External Dependencies` - any new services or constraints?
+
+If discrepancies found, update state file BEFORE continuing work.
+
+## Stable Checkpoints
+
+Before making significant/risky changes:
+
+1. Note current git commit in `## Stable Checkpoints`
+2. Add brief description of what's working
+3. Reference this if rollback needed
+
+## File Relationships
+
+When you notice files that change together:
+
+1. Add to `## File Relationships`
+2. Format: `Component X: file1.ts ↔ file2.ts ↔ file3.ts`
+3. Check this section when modifying related files to avoid breaking changes
+
+## Error Recovery
+
+**If you lose context mid-session:**
+- Re-read PROJECT_STATE.md
+- Ask user to confirm current task
+
+**If state file seems outdated:**
+- Ask user: "PROJECT_STATE.md shows [X] as current. Is this still accurate?"
+- Update based on their response
+
+**If conflicting information:**
+- User's direct instructions override state file
+- Update state file to reflect new direction
+
+## Response Behavior
+
+- **Don't narrate state management** - Update silently, don't say "I'm now updating the state file..."
+- **Do confirm context briefly** - "Continuing with password reset flow..." (one line)
+- **Don't over-explain** - State file is for YOUR reference, not a report to the user
+- **Do surface blockers** - If state file shows unresolved blockers, mention them
