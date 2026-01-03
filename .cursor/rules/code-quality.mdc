@@ -1,0 +1,89 @@
+# Code Quality Rules
+
+Simple quality gates to catch issues before they compound.
+
+## Self-Review Checklist
+
+Before presenting changes as complete, silently verify:
+
+1. **Does it work?** - Run the relevant command (test, build, typecheck)
+2. **Does it match the request?** - Re-read what was asked
+3. **Any obvious issues?** - Quick scan for typos, missing imports, console.logs
+4. **Side effects?** - Did changes break anything else?
+
+If any check fails, fix before reporting completion.
+
+## Test Protocol
+
+### When to Run Tests
+- After modifying any function with existing tests
+- After fixing a bug (verify the fix works)
+- Before marking a feature complete
+
+### What to Run
+```bash
+# Prefer targeted tests first
+npm test -- --grep "relevant-test"
+pytest path/to/test_file.py
+
+# Full suite for significant changes
+npm test
+pytest
+```
+
+### Test Failures
+1. Read the failure message carefully
+2. Fix the issue (don't skip or disable tests)
+3. Re-run to confirm fix
+4. If test is legitimately outdated, update it with explanation
+
+## Build Verification
+
+Run build/typecheck after:
+- Adding new dependencies
+- Modifying types/interfaces
+- Changes spanning multiple files
+
+```bash
+npm run build      # or npm run typecheck
+tsc --noEmit       # TypeScript check only
+```
+
+## Lint Protocol
+
+### Auto-fix First
+```bash
+npm run lint:fix   # or eslint --fix, prettier --write
+```
+
+### Manual Review
+If lint errors remain after auto-fix:
+1. Read the rule being violated
+2. Fix properly (don't disable without reason)
+3. If rule should be disabled, add comment explaining why
+
+## Code Style
+
+Follow existing patterns in the codebase:
+- Match indentation (tabs vs spaces)
+- Match naming conventions (camelCase, snake_case)
+- Match import organization
+- Don't "improve" unrelated code
+
+## Error Handling
+
+When you encounter errors:
+
+1. **Read the full error** - Don't just scan the first line
+2. **Check the stack trace** - Find the actual source
+3. **Search PROJECT_STATE.md** - Might be a known issue
+4. **Fix root cause** - Don't just suppress the symptom
+
+## Definition of Done
+
+A task is complete when:
+- [ ] Code works as requested
+- [ ] Tests pass (if applicable)
+- [ ] Build succeeds (if applicable)
+- [ ] No lint errors introduced
+- [ ] PROJECT_STATE.md updated

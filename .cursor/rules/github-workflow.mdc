@@ -1,0 +1,133 @@
+# GitHub Workflow Rules
+
+Consistent patterns for commits, PRs, and issues.
+
+## Commit Messages
+
+### Format
+```
+<type>: <short description>
+
+<optional body - what and why>
+```
+
+### Types
+- `feat:` - New feature
+- `fix:` - Bug fix
+- `refactor:` - Code change that neither fixes nor adds
+- `docs:` - Documentation only
+- `test:` - Adding or updating tests
+- `chore:` - Maintenance (deps, config, etc.)
+
+### Examples
+```
+feat: Add user authentication flow
+
+fix: Resolve race condition in data fetching
+
+refactor: Extract validation logic to separate module
+
+docs: Update API documentation for v2 endpoints
+```
+
+### Guidelines
+- First line under 72 characters
+- Use imperative mood ("Add" not "Added")
+- Body explains WHY, not just WHAT
+- Reference issues when relevant: `Fixes #123`
+
+## Branch Naming
+
+```
+<type>/<short-description>
+
+feature/user-auth
+fix/login-redirect
+refactor/api-client
+```
+
+## Pull Requests
+
+### Title
+Same format as commits: `<type>: <description>`
+
+### Body Template
+```markdown
+## Summary
+Brief description of changes (2-3 sentences max)
+
+## Changes
+- Key change 1
+- Key change 2
+
+## Testing
+How this was tested
+
+## Related
+Fixes #123 (if applicable)
+```
+
+### Before Creating PR
+1. Ensure branch is up to date with main
+2. All tests pass
+3. Build succeeds
+4. Self-review the diff
+
+## Issues
+
+### When to Create
+- Bug reports
+- Feature requests
+- Tasks that need tracking
+
+### Issue Body
+```markdown
+## Description
+What is happening / what is needed
+
+## Steps to Reproduce (bugs)
+1. Step one
+2. Step two
+
+## Expected Behavior
+What should happen
+
+## Environment (if relevant)
+- OS, browser, versions
+```
+
+## Git Operations
+
+### Safe Practices
+- Pull before starting work: `git pull origin main`
+- Commit frequently with clear messages
+- Push regularly to backup work
+
+### Avoid
+- Force pushing to shared branches
+- Committing secrets or credentials
+- Large commits with unrelated changes
+
+## Quick Commands
+
+```bash
+# Start new feature
+git checkout main && git pull
+git checkout -b feature/new-thing
+
+# Commit changes
+git add -p                    # Review changes interactively
+git commit -m "feat: Add new thing"
+
+# Push and create PR
+git push -u origin feature/new-thing
+gh pr create --fill
+
+# Update branch with main
+git fetch origin main
+git rebase origin/main
+
+# Quick status
+git status
+git log --oneline -5
+```

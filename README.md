@@ -21,6 +21,8 @@ A lightweight system that gives the AI instant context with optional safety guar
 | `.cursor/rules/session-state.mdc` | Instructions for AI behavior | Never (static rules) |
 | `.cursor/rules/safety.mdc` | Safety prompting rules | Never (static rules) |
 | `.cursor/rules/tool-mastery.mdc` | Optimal tool usage patterns | Never (static rules) |
+| `.cursor/rules/code-quality.mdc` | Self-review, tests, linting | Never (static rules) |
+| `.cursor/rules/github-workflow.mdc` | Commits, PRs, issues | Never (static rules) |
 | `PROJECT_STATE.md` | Current project state | Every session (AI maintains) |
 | `SAFETY.md` | Safety profile and boundaries | As needed (user configures) |
 
@@ -28,21 +30,20 @@ A lightweight system that gives the AI instant context with optional safety guar
 
 ## Quick Start
 
-### Option 1: Use as GitHub Template
+### Option 1: One-Command Setup (Recommended)
+
+```bash
+curl -sL https://raw.githubusercontent.com/gavinbmoore/cursor-session-state-template/main/scripts/init-project.sh | bash
+```
+
+This downloads all rule files, `PROJECT_STATE.md`, and `SAFETY.md` to your project.
+
+### Option 2: Use as GitHub Template
 
 1. Click "Use this template" on GitHub
 2. Clone your new repo
 3. Fill in `PROJECT_STATE.md` with your project details
 4. Start coding with Cursor
-
-### Option 2: Manual Setup
-
-```bash
-# Copy the essential files to your project
-curl -o PROJECT_STATE.md https://raw.githubusercontent.com/YOUR_USERNAME/cursor-session-state-template/main/PROJECT_STATE.md
-mkdir -p .cursor/rules
-curl -o .cursor/rules/session-state.mdc https://raw.githubusercontent.com/YOUR_USERNAME/cursor-session-state-template/main/.cursor/rules/session-state.mdc
-```
 
 ## File Overview
 
@@ -50,13 +51,15 @@ curl -o .cursor/rules/session-state.mdc https://raw.githubusercontent.com/YOUR_U
 your-project/
 ├── .cursor/
 │   └── rules/
-│       ├── session-state.mdc    # AI behavior instructions (auto-loads)
-│       ├── safety.mdc           # Safety prompting rules (auto-loads)
-│       └── tool-mastery.mdc     # Optimal tool usage (auto-loads)
+│       ├── session-state.mdc    # AI behavior instructions
+│       ├── safety.mdc           # Safety prompting rules
+│       ├── tool-mastery.mdc     # Optimal tool usage
+│       ├── code-quality.mdc     # Self-review, tests, linting
+│       └── github-workflow.mdc  # Commits, PRs, issues
 ├── .cursorignore                # Keeps irrelevant files out of context
 ├── PROJECT_STATE.md             # Dynamic state (AI updates this)
 ├── SAFETY.md                    # Safety profile and boundaries (you configure)
-└── AGENTS.md                    # Optional: Architectural guide (JIT indexing)
+└── AGENTS.md                    # Optional: Architectural guide
 ```
 
 ## How It Works
@@ -175,6 +178,24 @@ For semantic search (documentation, examples, best practices), the rules include
 - Use specific queries with version numbers
 - Search for exact error messages
 - Don't use for project-internal information
+
+## Code Quality
+
+The `code-quality.mdc` rules ensure consistent quality without manual oversight.
+
+- **Self-review checklist** - Verify changes work, match request, no obvious issues
+- **Test protocol** - When to run tests, how to handle failures
+- **Build verification** - Check builds after multi-file changes
+- **Definition of done** - Clear criteria before marking tasks complete
+
+## GitHub Workflow
+
+The `github-workflow.mdc` rules standardize git operations.
+
+- **Commit format** - `<type>: <description>` (feat, fix, refactor, docs, test, chore)
+- **Branch naming** - `<type>/<short-description>`
+- **PR template** - Summary, changes, testing, related issues
+- **Safe practices** - Pull before work, commit frequently, avoid force push
 
 ## Integration with Other Frameworks
 
