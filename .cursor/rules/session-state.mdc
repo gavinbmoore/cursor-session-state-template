@@ -7,9 +7,10 @@ You are an AI assistant with persistent context across sessions via PROJECT_STAT
 **At the START of every conversation:**
 
 1. Read `PROJECT_STATE.md` FIRST before doing anything else
-2. Understand: current phase, active task, recent changes, and next steps
-3. If state file is current (updated within last session), DO NOT scan the full codebase
-4. Briefly acknowledge where we are: "Continuing with [current task]..." (one line, not verbose)
+2. Read `SAFETY.md` to understand active safety profile and boundaries
+3. Understand: current phase, active task, recent changes, and next steps
+4. If state file is current (updated within last session), DO NOT scan the full codebase
+5. Briefly acknowledge where we are: "Continuing with [current task]..." (one line, not verbose)
 
 **If PROJECT_STATE.md is missing or empty:**
 - Ask user for current project context
@@ -26,6 +27,7 @@ You are an AI assistant with persistent context across sessions via PROJECT_STAT
 4. Update `## Next Steps` based on what you learned
 5. Add any discoveries to `## Lessons Learned`
 6. Log significant decisions in `## Decisions Log`
+7. Update `## Action Log` per active safety profile (see SAFETY.md)
 
 **Update BEFORE telling the user you're done.** This is mandatory, not optional.
 

@@ -14,14 +14,16 @@ This fills 40-50% of your context window just to get oriented. Knowledge from pr
 
 ## The Solution
 
-A two-file system that gives the AI instant context:
+A lightweight system that gives the AI instant context with optional safety guardrails:
 
 | File | Purpose | Updates |
 |------|---------|---------|
 | `.cursor/rules/session-state.mdc` | Instructions for AI behavior | Never (static rules) |
+| `.cursor/rules/safety.mdc` | Safety prompting rules | Never (static rules) |
 | `PROJECT_STATE.md` | Current project state | Every session (AI maintains) |
+| `SAFETY.md` | Safety profile and boundaries | As needed (user configures) |
 
-**Result:** Start new chats with ~5% context usage instead of 40-50%.
+**Result:** Start new chats with ~5% context usage instead of 40-50%, with configurable safety guardrails.
 
 ## Quick Start
 
@@ -47,9 +49,11 @@ curl -o .cursor/rules/session-state.mdc https://raw.githubusercontent.com/YOUR_U
 your-project/
 ├── .cursor/
 │   └── rules/
-│       └── session-state.mdc    # AI behavior instructions (auto-loads)
+│       ├── session-state.mdc    # AI behavior instructions (auto-loads)
+│       └── safety.mdc           # Safety prompting rules (auto-loads)
 ├── .cursorignore                # Keeps irrelevant files out of context
 ├── PROJECT_STATE.md             # Dynamic state (AI updates this)
+├── SAFETY.md                    # Safety profile and boundaries (you configure)
 └── AGENTS.md                    # Optional: Architectural guide (JIT indexing)
 ```
 
@@ -100,6 +104,45 @@ Update PROJECT_STATE.md with what we just did.
 | **External Dependencies** | APIs, services, constraints |
 | **Quick Commands** | Project-specific commands |
 | **Stable Checkpoints** | Known-good git commits |
+| **Action Log** | Safety: significant AI actions |
+
+## Safety Prompting (Optional)
+
+This template includes optional safety guardrails that encourage deliberate, reversible AI actions.
+
+> **Note:** These are *prompting guidelines*, not hard enforcement. The AI commits to follow them, but there's no technical mechanism preventing violations. For actual enforcement, see the git hooks section in `SAFETY.md`.
+
+### Safety Profiles
+
+Configure in `SAFETY.md` by setting **Active Profile:**
+
+| Profile | Best For | Behavior |
+|---------|----------|----------|
+| **Minimal** | Rapid prototyping, trusted environments | Log destructive actions only, escalate on deletions |
+| **Standard** | Most projects (default) | Log modifications, plan for 3+ files, checkpoint every 5 changes |
+| **Strict** | Production code, team environments | Log everything with reasoning, escalate broadly, frequent checkpoints |
+
+### Key Safety Features
+
+- **Action Logging** - Track significant AI actions for auditability
+- **Escalation Triggers** - AI pauses for confirmation before destructive/sensitive operations
+- **Scope Boundaries** - Define allowed paths, read-only files, and deny lists
+- **Rate Limits** - Auto-pause after N changes or errors
+- **Rollback Protocol** - Checkpoint before risky operations, clear recovery steps
+- **Planning Requirements** - Require explicit plans for multi-file changes
+
+### Quick Setup
+
+1. Open `SAFETY.md`
+2. Set your desired profile: `**Active Profile:** standard`
+3. Customize `## Scope Boundaries` for your project
+4. Review `## Escalation Triggers` and adjust as needed
+
+### External Enforcement
+
+For actual technical controls beyond AI prompting, `SAFETY.md` includes ready-to-use:
+- Git pre-commit hooks (block secrets, protect sensitive files)
+- GitHub Actions workflow (CI secret scanning)
 
 ## Integration with Other Frameworks
 
