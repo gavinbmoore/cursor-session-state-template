@@ -20,6 +20,7 @@ A lightweight system that gives the AI instant context with optional safety guar
 |------|---------|---------|
 | `.cursor/rules/session-state.mdc` | Instructions for AI behavior | Never (static rules) |
 | `.cursor/rules/safety.mdc` | Safety prompting rules | Never (static rules) |
+| `.cursor/rules/tool-mastery.mdc` | Optimal tool usage patterns | Never (static rules) |
 | `PROJECT_STATE.md` | Current project state | Every session (AI maintains) |
 | `SAFETY.md` | Safety profile and boundaries | As needed (user configures) |
 
@@ -50,7 +51,8 @@ your-project/
 ├── .cursor/
 │   └── rules/
 │       ├── session-state.mdc    # AI behavior instructions (auto-loads)
-│       └── safety.mdc           # Safety prompting rules (auto-loads)
+│       ├── safety.mdc           # Safety prompting rules (auto-loads)
+│       └── tool-mastery.mdc     # Optimal tool usage (auto-loads)
 ├── .cursorignore                # Keeps irrelevant files out of context
 ├── PROJECT_STATE.md             # Dynamic state (AI updates this)
 ├── SAFETY.md                    # Safety profile and boundaries (you configure)
@@ -143,6 +145,36 @@ Configure in `SAFETY.md` by setting **Active Profile:**
 For actual technical controls beyond AI prompting, `SAFETY.md` includes ready-to-use:
 - Git pre-commit hooks (block secrets, protect sensitive files)
 - GitHub Actions workflow (CI secret scanning)
+
+## Tool Mastery
+
+The `tool-mastery.mdc` rules optimize AI tool usage for efficiency and accuracy.
+
+### Key Principles
+
+| Principle | Description |
+|-----------|-------------|
+| **Right tool for task** | Glob for files, Grep for content, Read for reading, Edit for changes |
+| **Narrow before broad** | Start with specific searches, expand only if needed |
+| **Parallel when independent** | Read multiple files simultaneously when they don't depend on each other |
+| **Read before edit** | Always understand before modifying |
+
+### Tool Selection Quick Reference
+
+| Task | Tool | Anti-pattern |
+|------|------|--------------|
+| Find file by name | Glob | ❌ `find` via Bash |
+| Find content in files | Grep | ❌ `grep` via Bash |
+| Read file contents | Read | ❌ `cat` via Bash |
+| Modify existing file | Edit | ❌ `sed`/`awk` via Bash |
+| Find documentation | EXA | ❌ Generic web search |
+
+### External Tools: EXA
+
+For semantic search (documentation, examples, best practices), the rules include guidance for EXA:
+- Use specific queries with version numbers
+- Search for exact error messages
+- Don't use for project-internal information
 
 ## Integration with Other Frameworks
 

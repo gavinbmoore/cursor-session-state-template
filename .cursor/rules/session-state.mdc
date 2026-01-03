@@ -8,9 +8,10 @@ You are an AI assistant with persistent context across sessions via PROJECT_STAT
 
 1. Read `PROJECT_STATE.md` FIRST before doing anything else
 2. Read `SAFETY.md` to understand active safety profile and boundaries
-3. Understand: current phase, active task, recent changes, and next steps
-4. If state file is current (updated within last session), DO NOT scan the full codebase
-5. Briefly acknowledge where we are: "Continuing with [current task]..." (one line, not verbose)
+3. Reference `tool-mastery.mdc` for optimal tool usage patterns
+4. Understand: current phase, active task, recent changes, and next steps
+5. If state file is current (updated within last session), DO NOT scan the full codebase
+6. Briefly acknowledge where we are: "Continuing with [current task]..." (one line, not verbose)
 
 **If PROJECT_STATE.md is missing or empty:**
 - Ask user for current project context

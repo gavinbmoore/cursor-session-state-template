@@ -1,0 +1,309 @@
+# Tool Mastery Rules
+
+Maximize efficiency and accuracy by using the right tool for each task. These patterns reduce token usage, minimize errors, and speed up development.
+
+## Core Principles
+
+1. **Right tool for the task** - Each tool has optimal use cases
+2. **Narrow before broad** - Start specific, widen only if needed
+3. **Parallel when independent** - Run unrelated operations simultaneously
+4. **Read before edit** - Always understand before modifying
+5. **Verify after change** - Confirm modifications worked
+
+---
+
+## File Discovery: Glob vs Grep
+
+### Use Glob When:
+- Finding files by name pattern: `*.tsx`, `**/*test*.ts`
+- Locating specific file types in a directory
+- You know the filename but not the path
+
+```
+# Find all TypeScript test files
+Glob: **/*.test.ts
+
+# Find components
+Glob: src/components/**/*.tsx
+```
+
+### Use Grep When:
+- Searching for content inside files
+- Finding function/class definitions
+- Locating imports, usages, or patterns
+
+```
+# Find where a function is defined
+Grep: "function authenticateUser" or "const authenticateUser"
+
+# Find all imports of a module
+Grep: "from ['\".].*auth"
+
+# Find TODO comments
+Grep: "TODO|FIXME|HACK"
+```
+
+### Anti-patterns:
+- ❌ Using Bash `find` instead of Glob
+- ❌ Using Bash `grep` instead of Grep tool
+- ❌ Grepping for filenames (use Glob)
+- ❌ Globbing to find content (use Grep)
+
+---
+
+## File Reading: Strategic Approaches
+
+### Single File
+```
+Read: /path/to/file.ts
+```
+
+### Multiple Related Files (parallel)
+When you need context from several files, read them in parallel:
+```
+Read: /path/to/component.tsx
+Read: /path/to/component.test.tsx
+Read: /path/to/types.ts
+(all in same request)
+```
+
+### Large Files
+- Use `offset` and `limit` parameters for files >500 lines
+- Read the section you need, not the entire file
+- Check line count first if uncertain
+
+### Anti-patterns:
+- ❌ Using `cat` via Bash to read files
+- ❌ Reading files sequentially when they're independent
+- ❌ Reading entire large files when you need one section
+- ❌ Re-reading files you've already read in the conversation
+
+---
+
+## File Editing: Edit vs Write
+
+### Use Edit When:
+- Modifying existing content
+- Changing specific sections
+- The file already exists and you're updating it
+
+```
+Edit: Change "oldFunction" to "newFunction" in /path/file.ts
+```
+
+### Use Write When:
+- Creating new files
+- Complete file rewrites (rare)
+- File is short and changes are extensive
+
+### Edit Best Practices:
+1. **Read first** - Always read a file before editing
+2. **Unique match** - Ensure `old_string` matches exactly one location
+3. **Include context** - Add surrounding lines if match isn't unique
+4. **Preserve formatting** - Match existing indentation exactly
+
+### Anti-patterns:
+- ❌ Using `sed` or `awk` via Bash to edit files
+- ❌ Writing entire file when only changing a few lines
+- ❌ Editing without reading first
+- ❌ Guessing at file contents
+
+---
+
+## Search Strategy: Narrow to Broad
+
+### Level 1: Direct (when you know exactly what you want)
+```
+Read: /src/auth/login.ts          # Known path
+Glob: src/components/Button.tsx   # Known filename
+```
+
+### Level 2: Targeted (when you know the pattern)
+```
+Grep: "class UserService"         # Find definition
+Grep: "handleSubmit" --glob="*.tsx"  # Scoped search
+```
+
+### Level 3: Exploratory (when discovering)
+```
+Glob: **/*.config.*               # Find all configs
+Grep: "API_KEY|SECRET"            # Find sensitive patterns
+```
+
+### Level 4: Comprehensive (when you need full picture)
+```
+# Combine multiple searches in parallel
+Glob: src/**/*.ts
+Grep: "export.*function"
+Grep: "import.*from"
+```
+
+---
+
+## Bash: When and How
+
+### Use Bash For:
+- Git operations: `git status`, `git diff`, `git log`
+- Package management: `npm install`, `pip install`
+- Running tests: `npm test`, `pytest`
+- Build commands: `npm run build`
+- System operations: `mkdir`, `mv`, `cp`
+
+### Avoid Bash For:
+- ❌ Reading files (use Read)
+- ❌ Searching files (use Grep/Glob)
+- ❌ Editing files (use Edit)
+- ❌ Finding files (use Glob)
+
+### Bash Best Practices:
+```bash
+# Chain dependent commands
+git add . && git commit -m "message" && git push
+
+# Run independent commands in parallel (separate Bash calls)
+# Call 1: npm test
+# Call 2: npm run lint
+# (both in same message)
+```
+
+---
+
+## Parallel Execution
+
+### When to Parallelize:
+- Reading multiple independent files
+- Running independent searches
+- Executing unrelated commands
+
+### When to Sequence:
+- Edit depends on Read result
+- Command depends on previous command's output
+- File B imports from File A you're about to change
+
+### Example: Investigating a Bug
+```
+# Parallel (good) - gather context simultaneously
+Read: src/api/handler.ts
+Read: src/utils/validate.ts
+Grep: "errorCode"
+Bash: git log --oneline -5
+
+# Sequential (necessary) - edit depends on understanding
+1. Read file
+2. Understand issue
+3. Edit file
+4. Verify change
+```
+
+---
+
+## Context Efficiency
+
+### Minimize Token Usage:
+1. **Use PROJECT_STATE.md** - Don't re-scan what's already documented
+2. **Targeted reads** - Read specific sections, not entire files
+3. **Grep with filters** - Use `--glob` to narrow search scope
+4. **Reference, don't paste** - Point to files instead of copying content
+
+### Before Searching the Codebase:
+1. Check PROJECT_STATE.md for relevant context
+2. Check AGENTS.md for architectural guidance
+3. Check Lessons Learned for known patterns
+4. Then search if still needed
+
+---
+
+## External Tools
+
+### EXA (Semantic Search)
+Use for finding relevant documentation, examples, and up-to-date information.
+
+**When to use EXA:**
+- Finding current documentation for libraries/frameworks
+- Searching for code examples and patterns
+- Researching best practices
+- Finding solutions to specific errors
+
+**Best practices:**
+```
+# Specific queries work better than vague ones
+Good: "Next.js 14 app router middleware authentication"
+Bad: "how to do auth"
+
+# Include version numbers when relevant
+Good: "TypeScript 5.3 satisfies operator examples"
+Bad: "TypeScript satisfies"
+
+# Search for error messages directly
+Good: "NEXT_REDIRECT error in server component"
+```
+
+**When NOT to use EXA:**
+- Information already in codebase (use Grep)
+- Project-specific patterns (use PROJECT_STATE.md)
+- Internal documentation (use Read)
+
+---
+
+## Tool Selection Quick Reference
+
+| Task | Tool | Example |
+|------|------|---------|
+| Find file by name | Glob | `**/*.config.ts` |
+| Find content in files | Grep | `"function handleAuth"` |
+| Read file contents | Read | `/src/index.ts` |
+| Modify existing file | Edit | Change specific string |
+| Create new file | Write | New file with content |
+| Run commands | Bash | `npm test` |
+| Git operations | Bash | `git status` |
+| Find documentation | EXA | Library best practices |
+| Check project context | Read | `PROJECT_STATE.md` |
+
+---
+
+## Common Mistakes to Avoid
+
+1. **Searching before checking state files**
+   - Always check PROJECT_STATE.md first
+
+2. **Sequential reads of independent files**
+   - Parallelize when files don't depend on each other
+
+3. **Using Bash for file operations**
+   - Bash is for commands, not file I/O
+
+4. **Broad searches when narrow works**
+   - Start specific, expand only if needed
+
+5. **Re-reading unchanged files**
+   - Trust your earlier reads within the same session
+
+6. **Editing without reading**
+   - Always read to understand current state
+
+7. **Guessing at file contents or structure**
+   - When uncertain, verify first
+
+---
+
+## Verification Patterns
+
+### After Creating Files:
+```
+Read: /path/to/new/file.ts  # Verify content is correct
+```
+
+### After Editing:
+```
+# For code changes
+Bash: npm run typecheck  # Or relevant validation
+
+# For config changes
+Bash: npm run validate-config  # Or test the config
+```
+
+### After Multi-file Changes:
+```
+Bash: npm test           # Run test suite
+Bash: npm run build      # Verify build works
+```
