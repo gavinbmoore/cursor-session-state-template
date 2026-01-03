@@ -1,8 +1,9 @@
 # Project State
 
-<!-- 
+<!--
 AI INSTRUCTIONS: This file is your persistent memory across sessions.
 - Read this FIRST at the start of every conversation
+- Read SAFETY.md for safety boundaries and active profile
 - Update this BEFORE completing any task
 - Keep entries concise—one line per item when possible
 -->
@@ -98,9 +99,15 @@ npm run test:watch       # Watch mode
 npm run build            # Production build
 ```
 
+## Action Log
+
+<!-- Safety: Log significant AI actions. Keep last 15 entries. -->
+
+- [YYYY-MM-DD HH:MM] ACTION | Files: X | Note: description
+
 ## Stable Checkpoints
 
-<!-- Git commits representing known-good states for rollback -->
+<!-- Git commits representing known-good states for rollback. Create before risky operations. -->
 
 - `[commit-hash]` - [Description of stable state] ([YYYY-MM-DD])
 
