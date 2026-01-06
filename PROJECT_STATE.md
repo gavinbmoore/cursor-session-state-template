@@ -1,17 +1,20 @@
 # Project State
 
-<!-- 
+<!--
 AI INSTRUCTIONS: This file is your persistent memory across sessions.
 - Read this FIRST at the start of every conversation
 - Update this BEFORE completing any task
 - Keep entries concise—one line per item when possible
+- For slower-changing context, see PROJECT_CONTEXT.md
 -->
 
 ## Meta
 
 - **Last Updated:** [YYYY-MM-DD HH:MM]
+- **Active Session:** [tool-name] on [branch] | None
 - **Last Task:** [Brief description of last completed task]
 - **Current Phase:** [e.g., "MVP Development", "Auth Implementation", "Bug Fixes"]
+- **Current Branch:** [branch-name] (base: [main/master])
 - **Project:** [Project name]
 - **Stack:** [e.g., "Next.js 14, TypeScript, Supabase, Tailwind"]
 
@@ -39,10 +42,24 @@ Feature: [Feature Name]
 
 ## Recent Changes
 
-<!-- Prepend new entries. Keep last 10. Archive older ones if needed. -->
+<!-- Prepend new entries. Keep last 10. Archive older ones to PROJECT_ARCHIVE.md -->
 
 - [YYYY-MM-DD] Description of what was completed
 - [YYYY-MM-DD] Another completed item
+
+## Session Handoff
+
+<!-- Populated at END of session. Cleared at START of next session after reading. -->
+
+**Mid-Flight Work:**
+- [What was in progress when session ended]
+- [Files open/modified but not committed]
+
+**Unresolved Questions:**
+- [Questions that came up but weren't answered]
+
+**Context for Next Session:**
+- [Anything the next session needs to know immediately]
 
 ## Next Steps
 
@@ -51,32 +68,6 @@ Feature: [Feature Name]
 1. [Highest priority next task]
 2. [Second priority]
 3. [Third priority]
-
-## Lessons Learned
-
-<!-- Gotchas, workarounds, and discoveries worth remembering -->
-
-- [YYYY-MM-DD] [Gotcha/learning and how to handle it]
-
-## Decisions Log
-
-<!-- Key architectural/design decisions with rationale -->
-
-| Date | Decision | Rationale |
-|------|----------|-----------|
-| YYYY-MM-DD | [What was decided] | [Why this approach] |
-
-## File Relationships
-
-<!-- Files that typically change together -->
-
-- **[Feature/Component]:** `path/to/file1.ts` ↔ `path/to/file2.ts`
-
-## External Dependencies
-
-<!-- APIs, services, and their constraints -->
-
-- **[Service Name]:** [Key details—endpoints, rate limits, quirks]
 
 ## Quick Commands
 
@@ -98,18 +89,12 @@ npm run test:watch       # Watch mode
 npm run build            # Production build
 ```
 
-## Stable Checkpoints
-
-<!-- Git commits representing known-good states for rollback -->
-
-- `[commit-hash]` - [Description of stable state] ([YYYY-MM-DD])
-
 ---
 
-<!-- 
+<!--
 MAINTENANCE NOTES:
-- Keep this file under 100 lines if possible
-- Archive old Recent Changes periodically  
-- Validate accuracy every 3-5 tasks
-- This is for AI context, not human documentation
+- Keep this file under 80 lines if possible
+- Archive old Recent Changes to PROJECT_ARCHIVE.md
+- For lessons learned, decisions, and tech debt, see PROJECT_CONTEXT.md
+- Validate accuracy when switching features or branches
 -->

@@ -1,20 +1,32 @@
 # Session State Management Rules
 
-You are an AI assistant with persistent context across sessions via PROJECT_STATE.md.
+You are an AI assistant with persistent context across sessions via PROJECT_STATE.md and PROJECT_CONTEXT.md.
+
+## File Overview
+
+| File | Purpose | Update Frequency |
+|------|---------|------------------|
+| `PROJECT_STATE.md` | Current session state (hot) | Every session |
+| `PROJECT_CONTEXT.md` | Project knowledge (cold) | When content changes |
+| `PROJECT_ARCHIVE.md` | Historical entries | During archival |
 
 ## Context Loading Protocol
 
 **At the START of every conversation:**
 
 1. Read `PROJECT_STATE.md` FIRST before doing anything else
-2. Understand: current phase, active task, recent changes, and next steps
-3. If state file is current (updated within last session), DO NOT scan the full codebase
-4. Briefly acknowledge where we are: "Continuing with [current task]..." (one line, not verbose)
+2. Check `Active Session` field—if another session is active on same branch, ask user before proceeding
+3. Set `Active Session` to your tool/context identifier (e.g., "Cursor on main", "Claude Code on feature/auth")
+4. Read `Session Handoff` section and acknowledge any mid-flight work
+5. Clear the `Session Handoff` section after incorporating context
+6. If starting a new feature or returning from break, also read `PROJECT_CONTEXT.md`
+7. Briefly acknowledge where we are: "Continuing with [current task]..." (one line, not verbose)
 
-**If PROJECT_STATE.md is missing or empty:**
-- Ask user for current project context
-- Create/populate the state file based on their response
-- Then proceed with the task
+**If PROJECT_STATE.md is missing or contains only placeholders:**
+- Inform user: "I see this is a fresh project state. Let me help you populate it."
+- Ask for essentials: project name, current phase, tech stack, current focus
+- Populate Meta and Active Context from responses
+- Do NOT scan entire codebase to auto-populate
 
 ## State Update Protocol
 
@@ -24,24 +36,82 @@ You are an AI assistant with persistent context across sessions via PROJECT_STAT
 2. Move completed items from `## Current Task Breakdown` (mark with [x])
 3. Add entry to `## Recent Changes` (prepend, keep last 10 max)
 4. Update `## Next Steps` based on what you learned
-5. Add any discoveries to `## Lessons Learned`
-6. Log significant decisions in `## Decisions Log`
+5. Update `Current Branch` if you switched branches
 
 **Update BEFORE telling the user you're done.** This is mandatory, not optional.
 
+**Update PROJECT_CONTEXT.md when:**
+- You discover a gotcha → add to Lessons Learned
+- You make a significant decision → add to Decisions Log
+- You take a shortcut under time pressure → add to Technical Debt
+- You identify a recurring issue → add to Failure Patterns
+- You create a stable checkpoint → add to Stable Checkpoints
+
+## Session Handoff Protocol
+
+**Before ending ANY session:**
+
+1. Check if work is incomplete or in-progress
+2. If yes, populate `## Session Handoff` with:
+   - What you were doing
+   - What files are in a modified state
+   - Any context that would be lost
+   - If branch has open PR, note PR number
+3. Clear `Active Session` (set to "None")
+
+**At start of next session:**
+1. Read Session Handoff section
+2. Acknowledge any mid-flight work: "Resuming: [description]"
+3. Clear the section after incorporating context
+
+## Multi-Agent Safety Protocol
+
+**At session START:**
+1. Check `Active Session` field in Meta
+2. If another session is active:
+   - If same branch: ASK user "Another session may be active. Continue anyway?"
+   - If different branch: Proceed (separate workstreams)
+3. Set `Active Session` to your tool/context identifier
+
+**At session END:**
+1. Clear `Active Session` (set to "None")
+2. This happens BEFORE populating Session Handoff
+
+**If you detect conflicts:**
+1. Do NOT overwrite—ask user which version to keep
+2. State files use last-write-wins; be conservative
+
+**Identifier format:** `[Tool] on [branch]`
+- Examples: "Cursor on feature/auth", "Claude Code on main", "HumanLayer on fix/bug-123"
+
+## Atomic Update Protocol
+
+When updating state files:
+1. Read current content
+2. Make ALL changes in memory
+3. Write complete file in single operation
+4. Verify write succeeded before proceeding
+
+Never:
+- Make multiple sequential small edits
+- Leave file in intermediate state
+- Write partial sections
+
 ## What to Track
 
-### Always Update
+### Always Update (PROJECT_STATE.md)
 - Current task progress and completion
 - New files created or significantly modified
 - Blockers encountered and resolved
-- Decisions made during implementation
+- Branch changes
 
-### Update When Relevant
-- Gotchas and workarounds discovered
-- File relationships identified
-- External API quirks or constraints
-- Commands that were useful
+### Update When Relevant (PROJECT_CONTEXT.md)
+- Gotchas and workarounds discovered → Lessons Learned
+- Decisions made during implementation → Decisions Log
+- Shortcuts taken → Technical Debt
+- Recurring issues identified → Failure Patterns
+- File relationships identified → File Relationships
+- External API quirks or constraints → External Dependencies
 
 ### Never Track
 - Routine file reads
@@ -53,7 +123,7 @@ You are an AI assistant with persistent context across sessions via PROJECT_STAT
 1. **State file is your shortcut** - If PROJECT_STATE.md describes the current context, use it instead of scanning files
 2. **Reference, don't duplicate** - Point to files/functions, don't copy their contents into state
 3. **Concise entries** - Each log entry should be one line when possible
-4. **Prune aggressively** - Keep Recent Changes to last 10 items, archive older entries if needed
+4. **Prune aggressively** - Keep Recent Changes to last 10 items, archive older entries
 
 ## Task Breakdown Management
 
@@ -80,7 +150,7 @@ Feature: User Authentication
 
 When you discover something non-obvious:
 
-1. **Immediately** add to `## Lessons Learned`
+1. **Immediately** add to `## Lessons Learned` in PROJECT_CONTEXT.md
 2. Format: `- [DATE] Brief description of gotcha/solution`
 3. Before troubleshooting any issue, CHECK this section first—solution may exist
 
@@ -93,38 +163,89 @@ Examples of what to log:
 
 For significant decisions (architecture, library choices, patterns):
 
-1. Log in `## Decisions Log` with date
+1. Log in `## Decisions Log` in PROJECT_CONTEXT.md with date
 2. Include brief rationale (WHY, not just WHAT)
 3. Note alternatives considered if relevant
 
 This prevents re-debating settled decisions in future sessions.
 
-## State Validation
+## State Validation Triggers
 
-**Every 3-5 tasks, or when session feels "off":**
+**Validate state file accuracy when:**
+1. Starting work on a NEW feature (not continuation)
+2. Switching branches
+3. After any file deletion or major rename
+4. After 15+ tool calls without a state update
+5. When something feels "off" or context seems stale
+6. After returning from extended break (>24 hours)
 
-1. Scan `## Current Task Breakdown` - does it match actual implementation?
-2. Check `## Next Steps` - still accurate priorities?
-3. Review `## Lessons Learned` - anything to add from recent work?
-4. Verify `## External Dependencies` - any new services or constraints?
+**Validation checklist:**
+- [ ] Does `Current Branch` match actual branch?
+- [ ] Does `Current Task Breakdown` reflect actual progress?
+- [ ] Are `Next Steps` still the right priorities?
+- [ ] Is `Active Session` correctly set?
 
-If discrepancies found, update state file BEFORE continuing work.
+**If discrepancies found:**
+1. Update state BEFORE continuing work
+2. Note significant corrections in Session Handoff
 
 ## Stable Checkpoints
 
 Before making significant/risky changes:
 
-1. Note current git commit in `## Stable Checkpoints`
-2. Add brief description of what's working
-3. Reference this if rollback needed
+1. Note current git commit in `## Stable Checkpoints` in PROJECT_CONTEXT.md
+2. Add description of what's working
+3. Add recovery notes (what command to run, what breaks if you go further)
+4. Reference this if rollback needed
 
 ## File Relationships
 
 When you notice files that change together:
 
-1. Add to `## File Relationships`
-2. Format: `Component X: file1.ts ↔ file2.ts ↔ file3.ts`
+1. Add to `## File Relationships` in PROJECT_CONTEXT.md
+2. Format: `**Component X:** file1.ts ↔ file2.ts ↔ file3.ts`
 3. Check this section when modifying related files to avoid breaking changes
+
+## Archival Protocol
+
+**When to archive:**
+- PROJECT_STATE.md exceeds 100 lines
+- Monthly (first session of new month)
+- When completing a major feature/milestone
+
+**What to archive:**
+- Recent Changes older than 2 weeks (keep last 10)
+- Completed Task Breakdowns (move summary to archive)
+- Resolved blockers
+
+**How to archive:**
+1. Create/update PROJECT_ARCHIVE.md
+2. Move old entries under month header
+3. Keep PROJECT_STATE.md focused on current work
+
+**What stays in PROJECT_CONTEXT.md (never archived):**
+- Technical Debt (until resolved)
+- Failure Patterns (until obsolete)
+- Lessons Learned (cumulative knowledge)
+- Decisions Log (permanent record)
+
+## Incremental Population
+
+When you notice a section is empty or sparse during normal work:
+
+**Do:**
+- Populate it naturally as relevant information emerges
+- Example: After making a decision, add to Decisions Log
+- Example: After discovering a gotcha, add to Lessons Learned
+
+**Don't:**
+- Stop work to exhaustively fill empty sections
+- Ask user to populate sections unrelated to current task
+- Auto-generate content by scanning codebase
+
+**Gentle prompts (use sparingly, max 1 per session):**
+- "I noticed [section] is empty. Want me to add [specific item] based on what we just did?"
+- Only prompt if the addition is directly relevant to completed work
 
 ## Error Recovery
 

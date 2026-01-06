@@ -1,7 +1,7 @@
 # Project State — EXAMPLE
 
-<!-- 
-This is an EXAMPLE of a filled-in PROJECT_STATE.md.
+<!--
+This is an EXAMPLE of a filled-in PROJECT_STATE.md showing the new slimmed-down structure.
 Copy PROJECT_STATE.md (the template) to your project and customize.
 Delete this file—it's just for reference.
 -->
@@ -9,8 +9,10 @@ Delete this file—it's just for reference.
 ## Meta
 
 - **Last Updated:** 2024-12-16 14:30
+- **Active Session:** Cursor on feature/password-reset
 - **Last Task:** Completed password reset request UI
 - **Current Phase:** MVP Development - Authentication Flow
+- **Current Branch:** feature/password-reset (base: main)
 - **Project:** SaaS Starter Kit
 - **Stack:** Next.js 14, TypeScript, Supabase, Tailwind, Shadcn/ui
 
@@ -50,6 +52,20 @@ Feature: User Authentication
 - [2024-12-13] Initial Supabase setup and RLS policies
 - [2024-12-13] Added shadcn/ui components (Button, Input, Card, Form)
 
+## Session Handoff
+
+<!-- This section was populated at end of last session -->
+
+**Mid-Flight Work:**
+- Email template partially complete in `src/lib/email/templates/password-reset.tsx`
+- React Email preview server was running on port 3001
+
+**Unresolved Questions:**
+- Should reset link expire after 1 hour or 24 hours?
+
+**Context for Next Session:**
+- PR #42 open for password reset UI, waiting on email template before merge
+
 ## Next Steps
 
 1. Create password reset email template (React Email)
@@ -58,34 +74,6 @@ Feature: User Authentication
 4. Add OAuth provider buttons to login/register
 5. Implement "remember me" with extended session
 
-## Lessons Learned
-
-- [2024-12-16] Supabase `resetPasswordForEmail` requires exact redirect URL in dashboard settings
-- [2024-12-15] React Email templates must be in separate package for Resend to compile
-- [2024-12-14] Supabase RLS: Must enable policies BEFORE seeding test data
-- [2024-12-13] Next.js 14: Server actions can't be imported into client components directly—use 'use server' file
-
-## Decisions Log
-
-| Date | Decision | Rationale |
-|------|----------|-----------|
-| 2024-12-16 | Use React Email over MJML | Better TypeScript support, component reuse |
-| 2024-12-15 | Resend over SendGrid | Simpler API, better DX, generous free tier |
-| 2024-12-14 | Supabase Auth over NextAuth | Native Supabase integration, RLS policies |
-| 2024-12-13 | Shadcn/ui over Radix directly | Pre-built components, easy customization |
-
-## File Relationships
-
-- **Auth Forms:** `src/app/(auth)/*/page.tsx` ↔ `src/lib/validations/auth.ts` ↔ `src/components/auth/*`
-- **Email Templates:** `src/lib/email/templates/*.tsx` ↔ `supabase/functions/*/index.ts`
-- **Supabase Types:** `supabase/migrations/*.sql` → run `supabase gen types` → `src/types/database.ts`
-
-## External Dependencies
-
-- **Supabase:** Project `abcd1234`, using Auth + Database + Edge Functions
-- **Resend:** API key in `.env.local`, domain verified, 100 emails/day free tier
-- **Vercel:** Deployment target, preview URLs enabled for PR reviews
-
 ## Quick Commands
 
 ```bash
@@ -93,12 +81,12 @@ Feature: User Authentication
 npm run dev                    # Start Next.js dev server (port 3000)
 supabase start                 # Start local Supabase (port 54321)
 
+# Email Development
+npm run email:dev              # Preview React Email templates (port 3001)
+
 # Database
 supabase db reset              # Reset local DB and run migrations
 supabase gen types typescript --local > src/types/database.ts
-
-# Email Development
-npm run email:dev              # Preview React Email templates
 
 # Testing
 npm test                       # Run Vitest
@@ -109,14 +97,12 @@ npm run build                  # Production build
 supabase db push               # Push migrations to production
 ```
 
-## Stable Checkpoints
-
-- `a1b2c3d` - Login/register working, pre-password-reset (2024-12-15)
-- `e4f5g6h` - Initial Supabase setup complete (2024-12-13)
-
 ---
 
 <!--
-This example shows a mid-development state.
-Your actual file will look different based on your project.
+This example shows:
+- Active Session field for multi-agent safety
+- Current Branch with base branch
+- Session Handoff with mid-flight context
+- Slimmed-down structure (no Lessons Learned, Decisions—those are in PROJECT_CONTEXT.md)
 -->
